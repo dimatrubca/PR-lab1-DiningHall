@@ -1,12 +1,10 @@
 
 class Order:
-    def __init__(self, id, items, priority, max_wait) -> None:
+    def __init__(self, id, items, priority, max_wait, table_id, waiter_id) -> None:
         self.id = id
         self.items = items
         self.priority = priority
         self.max_wait = max_wait
-
-    
-    @staticmethod
-    def generate_random_order(menu):
-        pass
+        self.table_id = table_id
+        self.waiter_id = waiter_id
+        self.pick_up_time = None

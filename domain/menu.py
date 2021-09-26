@@ -1,4 +1,5 @@
 import json
+
 class RestaurantMenu:
     def __init__(self) -> None:
         self.foods = []
@@ -7,4 +8,3 @@ class RestaurantMenu:
             data  = json.load(file)
 
         self.foods = data
-        print("Foods: ", self.foods)
