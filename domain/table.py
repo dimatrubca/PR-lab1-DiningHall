@@ -1,8 +1,10 @@
 import json
 import random
+import threading
 import uuid
 from datetime import datetime
 import logging
+import time
 
 from .order import Order
 from enum import Enum
@@ -29,23 +31,36 @@ class Table:
         order_id = str(uuid.uuid4())
         num_items = random.randint(1, 10)
         items = random.choices(self.dinning_hall.menu.foods, k=num_items)
+        item_ids = [item['id'] for item in items]
        # print(json.dumps(items))
         max_wait = max([1.3 * food_item['preparation-time'] for food_item in items]) # preparation-time_
         priority = random.randint(1, 5)
         
-        self.order = Order(order_id, items, priority, max_wait, self.id, waiter_id)
+        self.order = Order(order_id, item_ids, priority, max_wait, self.id, waiter_id)
         self.order.pick_up_time = datetime.utcnow().timestamp()
 
-        logger.info("Random order generated:  " + str(self.order.id))
+        logger.info(f"Random order for table {self.id} generated: " + str(self.order.order_id))
 
         return self.order
 
     def validate_order(self, distribution): # TODO: expand logic (mapper)
-        if self.order.id != distribution.order_id:
+        if not self.order or self.order.order_id != distribution.order_id:
             return False
         
-        return False
+        return True
+
+    def __wait_for_visitors(self):
+        time.sleep(random.randint(2, 4))
+        self.state = TableState.WAITING_TO_MAKE_ORDER
+        
+        logger.info(f"Table {self.id} waiting to be served")
+
 
     def free_table(self):
+        logger.info(f"Table {self.id} is Free")
+
         self.order = None
         self.state = TableState.FREE
+        
+        threading.Thread(target=self.__wait_for_visitors).start()
+        

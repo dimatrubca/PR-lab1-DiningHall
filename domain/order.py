@@ -1,7 +1,7 @@
 
 class Order:
     def __init__(self, id, items, priority, max_wait, table_id, waiter_id) -> None:
-        self.id = id
+        self.order_id = id
         self.items = items
         self.priority = priority
         self.max_wait = max_wait

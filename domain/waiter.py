@@ -1,8 +1,14 @@
+from typing import List
+from domain.distribution import Distribution
+from config import TIME_UNITS
 import json
 import requests
 import logging
 
 from .table import TableState
+import service
+import time
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +16,7 @@ logger = logging.getLogger(__name__)
 class Waiter:
     def __init__(self, id) -> None:
         self.serving_tables = []
-        self.prepared_orders = []
+        self.prepared_orders:List[Distribution] = []
         self.id = id
         
 
@@ -19,19 +25,20 @@ class Waiter:
             for table in tables:
                 if table.state == TableState.WAITING_TO_MAKE_ORDER:
                     order = table.generate_random_order(self.id)
+                    table.state = TableState.WAITING_ORDER_TO_BE_SERVED
+                    time.sleep(random.randint(2, 4) * TIME_UNITS)
 
-                    logger.info(f"Sending post request to http://localhost:5000/order, id = " + str(order.id))
-                    r = requests.post('http://localhost:5000/order', json=order.__dict__)
-                    print(r.ok)
+                    service.send_order_to_kitchen(order)
                     
                     self.serving_tables.append(table)
-                    table.state = TableState.WAITING_ORDER_TO_BE_SERVED
 
                     break
 
-            for order in self.prepared_orders:
+            for distribution in self.prepared_orders:
                 for table in self.serving_tables:
-                    if table.validate_order(order):
-                        table.state = TableState.FREE
+                    if table.validate_order(distribution):
+                        table.free_table()
 
-                        logger.info(f"Order served by waiter {self.id}")
+                        logger.info(f"Order {distribution.order_id} served by waiter {self.id}")
+
+                self.serving_tables[:] = [table for table in self.serving_tables if not table.validate_order(distribution)] # todo: replace with somewhat more efficient
