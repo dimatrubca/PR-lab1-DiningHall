@@ -1,4 +1,4 @@
-# PR-Lab1-Kitchen
+# PR-Lab1-DinningHall
 
 ## Usage
 ```docker build -t dinning-hall-image .```
