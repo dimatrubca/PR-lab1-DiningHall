@@ -6,7 +6,7 @@ from domain.dinning_hall import DinningHall
 import utils
 import time
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s:%(name)s:%(message)s', datefmt="%m/%d/%Y %I:%M:%S %p")
+logging.basicConfig(level=logging.WARN, format='%(asctime)s:%(name)s:%(message)s', datefmt="%m/%d/%Y %I:%M:%S %p")
 logger = logging.getLogger(__name__)
 
 
