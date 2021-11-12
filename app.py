@@ -1,12 +1,16 @@
-import threading
-import logging
 from flask import Flask, request
 from flask.json import jsonify
-from domain.dinning_hall import DinningHall
+import requests
+import threading
+import logging
 import utils
 import time
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s:%(name)s:%(message)s', datefmt="%m/%d/%Y %I:%M:%S %p")
+from domain.dinning_hall import DinningHall
+from service import KITCHEN_BASE_URL
+
+
+logging.basicConfig(level=logging.WARN, format='%(asctime)s:%(name)s:%(message)s', datefmt="%m/%d/%Y %I:%M:%S %p")
 logger = logging.getLogger(__name__)
 
 
@@ -25,7 +29,7 @@ def receive_order():
 
 
 if __name__ == "__main__":
-    threading.Thread(target=lambda: app.run(debug=True, use_reloader=False, port=5001, host="0.0.0.0")).start()
+    threading.Thread(target=lambda: app.run(debug=True, use_reloader=False, port=5001, host="0.0.0.0",)).start()
 
     time.sleep(5)
     dinning_hall = DinningHall()
