@@ -33,11 +33,11 @@ class Table:
 
     def generate_random_order(self, waiter_id):
         order_id = str(uuid.uuid4())
-        num_items = random.randint(1, 10)
+        num_items = random.randint(1, 4)
         items = random.choices(self.dinning_hall.menu.foods, k=num_items)
         item_ids = [item['id'] for item in items]
        # print(json.dumps(items))
-        max_wait = max([1.3 * food_item['preparation-time'] for food_item in items]) # preparation-time_
+        max_wait = 1.3 * max([food_item['preparation-time'] for food_item in items]) # preparation-time_
         priority = random.randint(1, 5)
         
         self.order = Order(order_id, item_ids, priority, max_wait, self.id, waiter_id)

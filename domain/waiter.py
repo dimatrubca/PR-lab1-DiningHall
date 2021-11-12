@@ -1,14 +1,16 @@
 from datetime import datetime
-import threading
 from typing import Dict, List
+import time
+import random
+import threading
+import logging
+
 from domain.distribution import Distribution
 from settings import TIME_UNITS
-import logging
 
 from .table import Table, TableState
 import service
-import time
-import random
+
 
 logger = logging.getLogger(__name__)
 
@@ -27,13 +29,14 @@ class Waiter:
             for table in tables:
                 table.state_lock.acquire()
                 if table.state == TableState.WAITING_TO_MAKE_ORDER:
+                    print("Table:", table.id)
                     table.state = TableState.WAITING_ORDER_TO_BE_SERVED
                     table.state_lock.release()
                     self.take_order(table)
                 else:
                     table.state_lock.release()
 
-            self.serve_distributions()
+            self.serve_distributions() #todo: sleep
 
     def add_distribution(self, distribution: Distribution):
         self.distributions_mutex.acquire()
@@ -72,6 +75,6 @@ class Waiter:
         time.sleep(random.randint(2, 4) / 1000 * TIME_UNITS)
 
         order.pick_up_time = datetime.utcnow().timestamp() 
-        logger.error(f"Order {order.order_id} picked up at {order.pick_up_time}")
+        logger.warn(f"Order {order.order_id} picked up at {order.pick_up_time}")
         self.serving_tables[table.id] = table
         service.send_order_to_kitchen(order)

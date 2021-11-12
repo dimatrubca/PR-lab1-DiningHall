@@ -4,12 +4,11 @@ import logging
 from typing import Dict
 
 from domain.distribution import Distribution
-
+from utils import get_order_mark
 from .menu import RestaurantMenu
 from .table import Table
 from .waiter import Waiter
 import settings
-from utils import get_order_mark
 
 logger = logging.getLogger(__name__)
 
@@ -40,10 +39,10 @@ class DinningHall:
     def on_order_served(self, distribution: Distribution):
         order_total_preparing_time = (datetime.utcnow().timestamp() -  distribution.pick_up_time)
 
-        mark = get_order_mark(order_total_preparing_time, distribution.max_wait)
+        mark = get_order_mark(order_total_preparing_time, distribution.max_wait * settings.TIME_UNITS / 1000)
         self.marks.append(mark)
 
-        logger.error(f"{distribution} mark = {mark}, order_total_preparing_time = {order_total_preparing_time}, max_wait = {distribution.max_wait}")
+        logger.error(f"{distribution} mark = {mark}, order_total_preparing_time = {order_total_preparing_time}, max_wait = {distribution.max_wait * settings.TIME_UNITS / 1000}")
         logger.error(datetime.utcnow().timestamp())
         logger.error(distribution.pick_up_time)
 
